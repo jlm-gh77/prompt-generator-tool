@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prompt Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      background: #3a5fcd;
+      color: #fff;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.dark {
+      background: #1e1e1e;
+      color: #f0f0f0;
+    }
+    .header {
+      text-align: center;
+      position: relative;
+      height: 250px;
+      background-color: #1e3a8a;
+      color: white;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 2.8rem;
+      text-shadow: 3px 3px 7px rgba(0, 0, 0, 0.6);
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+      color: #fff;
+    }
+    select, input[type="text"], textarea {
+      width: 100%; padding: 0.5rem; margin-top: 0.5rem;
+      border: 1px solid #ccc; border-radius: 4px;
+    }
+    button {
+      margin-top: 1rem; padding: 0.75rem 1.5rem;
+      font-size: 1rem; cursor: pointer;
+      background-color: #007BFF; color: white;
+      border: none; border-radius: 4px;
+    }
+    #output {
+      white-space: pre-wrap;
+      background: white;
+      color: #000;
+      padding: 1rem;
+      border-radius: 5px;
+      margin-top: 2rem;
+      border: 1px solid #ccc;
+    }
+    #output.dark {
+      background: #2b2b2b;
+      color: #fff;
+      border-color: #444;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🧠 Prompt Generator Tool</h1>
+  </div>
+
+  <label>Category:</label>
+  <input type="text" id="category" placeholder="e.g., Cybersecurity, Medicine, Finance" />
+
+  <label>Project Title or Purpose:</label>
+  <input type="text" id="purpose" placeholder="e.g., Training Module on Zero Trust" />
+
+  <label>Primary Topic or Keyword:</label>
+  <input type="text" id="topic" placeholder="e.g., Zero Trust Architecture" />
+
+  <label>Role:</label>
+  <input type="text" id="role" placeholder="e.g., Cybersecurity Architect" />
+
+  <label>Output Format:</label>
+  <select id="format">
+    <option>Bullet Points</option>
+    <option>Step-by-Step</option>
+    <option>Table</option>
+    <option>Essay</option>
+    <option>Script Code</option>
+    <option>Outline</option>
+  </select>
+
+  <label>Tone:</label>
+  <select id="tone">
+    <option>Formal</option>
+    <option>Technical</option>
+    <option>Simplified</option>
+    <option>Academic</option>
+    <option>Conversational</option>
+  </select>
+
+  <label>Audience Level:</label>
+  <select id="audience">
+    <option>Beginner</option>
+    <option>Intermediate</option>
+    <option>Advanced</option>
+    <option>Expert</option>
+  </select>
+
+  <label>Language:</label>
+  <input type="text" id="language" value="English" />
+
+  <label>Input Data / Background:</label>
+  <textarea id="inputData" rows="4" placeholder="Provide specific background, problem or scenario..."></textarea>
+
+  <button onclick="generatePrompt()">Generate Prompt</button>
+  <button onclick="copyPrompt()">Copy to Clipboard</button>
+  <button onclick="downloadPrompt()">Download as .txt</button>
+  <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
+  <button onclick="saveFields()">Save Input</button>
+  <button onclick="loadFields()">Load Input</button>
+
+  <div id="output"></div>
+
+  <script>
+    function generatePrompt() {
+      const category = document.getElementById('category').value;
+      const purpose = document.getElementById('purpose').value;
+      const topic = document.getElementById('topic').value;
+      const role = document.getElementById('role').value;
+      const format = document.getElementById('format').value;
+      const tone = document.getElementById('tone').value;
+      const audience = document.getElementById('audience').value;
+      const language = document.getElementById('language').value;
+      const inputData = document.getElementById('inputData').value;
+
+      const prompt = `You are a highly qualified expert in the field of: ${category}. Act as a Senior-Level Specialist with deep, real-world experience, delivering accurate and actionable information grounded in industry best practices, verified data, and documented sources when possible.
+
+### Context:
+I am working on: ${purpose}.
+
+### Objectives:
+- Provide deep insights on the topic: ${topic}.
+- Ensure real-world accuracy, avoiding hypothetical or unverified claims.
+- Use clear, structured explanations that can be easily reused or documented.
+
+### Requirements:
+1. Use your expertise as a ${role} to analyze and explain the subject matter in practical, real-world terms.
+2. Include step-by-step breakdowns where applicable.
+3. If the topic includes a process, provide use-case examples or implementation steps.
+4. Avoid hallucinations or speculative responses.
+5. Cite official resources, whitepapers, or governing bodies if applicable.
+6. Do not generalize. Tailor everything to the specific input given.
+
+### Prompt Chaining Logic:
+After the initial response, if there are additional areas that logically follow based on the ${category}, ${topic}, or questions I might ask next, present a list of follow-up suggestions or a logical sequence of topics to expand the insight.
+
+### Output Style:
+- Format: ${format}
+- Tone: ${tone}
+- Language: ${language}
+- Audience Level: ${audience}
+
+### Input Data:
+${inputData}
+
+Respond now with detailed, structured, real-world-based insights that adhere strictly to the above requirements.`;
+
+      const outputDiv = document.getElementById('output');
+      outputDiv.textContent = prompt;
+    }
+
+    function copyPrompt() {
+      const output = document.getElementById('output').textContent;
+      navigator.clipboard.writeText(output).then(() => alert('Prompt copied to clipboard!'));
+    }
+
+    function downloadPrompt() {
+      const text = document.getElementById('output').textContent;
+      const blob = new Blob([text], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'generated_prompt.txt';
+      link.click();
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark');
+      document.getElementById('output').classList.toggle('dark');
+    }
+
+    function saveFields() {
+      const fields = ['category', 'purpose', 'topic', 'role', 'format', 'tone', 'audience', 'language', 'inputData'];
+      const data = {};
+      fields.forEach(id => data[id] = document.getElementById(id).value);
+      localStorage.setItem('promptInputs', JSON.stringify(data));
+      alert('Inputs saved locally!');
+    }
+
+    function loadFields() {
+      const data = JSON.parse(localStorage.getItem('promptInputs'));
+      if (!data) return alert('No saved data found.');
+      Object.keys(data).forEach(id => {
+        const field = document.getElementById(id);
+        if (field) field.value = data[id];
+      });
+      alert('Inputs loaded!');
+    }
+  </script>
+</body>
+</html>
